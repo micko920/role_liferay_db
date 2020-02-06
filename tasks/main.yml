@@ -1,0 +1,46 @@
+---
+- include_tasks: is_systemd.yml
+
+# Variable configuration.
+- include_tasks: variables.yml
+
+- name: Ensure dest exists
+  file:
+    path: "{{ liferay_scripts }}"
+    state: directory
+    recurse: true
+
+# Setup/install tasks.
+- include_tasks: setup-Debian.yml
+  when: ansible_os_family == 'Debian'
+
+- import_tasks: configure.yml
+
+- name: Ensure PostgreSQL is started and enabled on boot.
+  service:
+    name: "{{ postgresql_daemon }}"
+    state: "{{ postgresql_service_state }}"
+    enabled: "{{ postgresql_service_enabled }}"
+  when: systemd_pid_1 is defined and systemd_pid_1
+
+- name: Is PostgreSQL in background mode
+  become: true
+  become_user: "{{ postgresql_user }}"
+  command: "{{ postgresql_bin_path }}/pg_ctl status -D {{ postgresql_config_path }}"
+  register: pg_ctlout
+  when: systemd_pid_1 is not defined
+  failed_when: false
+  changed_when: false
+
+- name: Start PostgreSQL in background mode
+  become: true
+  become_user: "{{ postgresql_user }}"
+  command: "{{ postgresql_bin_path }}/pg_ctl -w start -D {{ postgresql_config_path }}"
+  register: pg_ctlout
+  when:
+    - systemd_pid_1 is not defined
+    - pg_ctlout.stdout.find('server is running') == -1
+
+# Configure PostgreSQL.
+- import_tasks: users.yml
+- import_tasks: databases.yml

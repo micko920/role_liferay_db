@@ -1,0 +1,34 @@
+---
+- name: restart postgresql
+  service:
+    name: "{{ postgresql_daemon }}"
+    state: "{{ postgresql_restarted_state }}"
+    sleep: 5
+  when: systemd_pid_1 is defined and systemd_pid_1
+
+- name: restart postgresql
+  become: true
+  become_user: "{{ postgresql_user }}"
+  command: "{{ postgresql_bin_path }}/pg_ctl -w restart -D {{ postgresql_config_path }}"
+  when: systemd_pid_1 is not defined
+
+# - name: Force-restart PostgreSQL after new locales are generated.
+#   service:
+#     name: "{{ postgresql_daemon }}"
+#     state: restarted
+#   when:
+#     - locale_gen_result.changed
+#     - systemd_pid_1 is defined and systemd_pid_1
+
+# - name: Stop background mode PostgreSQL
+#   become: true
+#   become_user: postgres
+#   command: "{{ postgresql_bin_path }}/pg_ctl -w stop -D {{ postgresql_config_path }}"
+#   when: systemd_pid_1 is not defined
+#   failed_when: false
+
+# - name: Start PostgreSQL in background mode
+#   become: true
+#   become_user: postgres
+#   command: "{{ postgresql_bin_path }}/pg_ctl -w start -D {{ postgresql_config_path }}"
+#   when: systemd_pid_1 is not defined

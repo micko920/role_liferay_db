@@ -1,0 +1,70 @@
+---
+# Set postgresql state when configuration changes are made. Recommended values:
+# `restarted` or `reloaded`
+postgresql_restarted_state: "restarted"
+
+postgresql_user: postgres
+postgresql_group: postgres
+
+postgresql_unix_socket_directories:
+  - /var/run/postgresql
+
+postgresql_service_state: started
+postgresql_service_enabled: true
+
+# Global configuration options that will be set in postgresql.conf.
+postgresql_global_config_options:
+  - option: unix_socket_directories
+    value: '{{ postgresql_unix_socket_directories | join(",") }}'
+  - option: listen_addresses
+    value: '*'
+
+# Host based authentication (hba) entries to be added to the pg_hba.conf. This
+# variable's defaults reflect the defaults that come with a fresh installation.
+postgresql_hba_entries:
+  - {type: local, database: all, user: postgres, auth_method: peer}
+  - {type: local, database: all, user: all, auth_method: peer}
+  - {type: host, database: all, user: all, address: '127.0.0.1/32', auth_method: md5}
+  - {type: host, database: all, user: all, address: '::1/128', auth_method: md5}
+  - {type: host, database: all, user: all, address: '0.0.0.0/0', auth_method: md5}
+
+liferay_db_locale: "en_NZ.UTF-8"
+liferay_root: "/opt/liferay"
+liferay_scripts: "{{ liferay_root }}/scripts"
+liferay_sql: "{{ liferay_scripts }}/sql"
+liferay_arcs: "{{ liferay_root }}/arcs"
+
+# Debian only. Used to generate the locales used by PostgreSQL databases.
+postgresql_locales:
+  - "{{ liferay_db_locale }}"
+
+# Users are done first then databases
+# Users to ensure exist.
+postgresql_users:
+  - name: liferaydb #required; the rest are optional
+    password: "md57054cf357de6f1f426c673de61576f10"
+    encrypted: true
+    # priv: ALL
+    role_attr_flags: LOGIN
+    state: present
+    # db: liferay
+    # login_host: # defaults to 'localhost'
+    # login_password: # defaults to not set
+    # login_user: # defaults to '{{ postgresql_user }}'
+    # login_unix_socket: # defaults to 1st of postgresql_unix_socket_directories
+    # port: # defaults to not set
+
+# Databases to ensure exist.
+postgresql_databases:
+  - name: liferay # required; the rest are optional
+    lc_collate: "{{ liferay_db_locale }}"
+    lc_ctype: "{{ liferay_db_locale }}"
+    encoding: "UTF-8"
+    owner: "liferaydb"
+    state: present
+    # template: # defaults to 'template0'
+    # login_host: # defaults to 'localhost'
+    # login_password: # defaults to not set
+    # login_user: # defaults to '{{ postgresql_user }}'
+    # login_unix_socket: # defaults to 1st of postgresql_unix_socket_directories
+    # port: # defaults to not set

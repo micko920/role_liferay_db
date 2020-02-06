@@ -1,0 +1,29 @@
+---
+- name: Prepare
+  hosts: all
+  become: true
+  vars_files:
+    - ../env.yml
+
+  tasks:
+    - name: Load role dependancies
+      include_vars:
+        file: ../prepare_roles.yml
+        name: dep_roles
+      failed_when: false
+
+    - name: Display role dependancies
+      debug: var=dep_role
+      loop: "{{ dep_roles.roles }}"
+      loop_control:
+        loop_var: dep_role
+      when: dep_roles.roles is defined and dep_roles.roles|length>0
+
+      # Now load all the dependency roles
+    - name: Add the role dependancies
+      include_role:
+        name: '{{ dep_role }}'
+      loop: "{{ dep_roles.roles }}"
+      loop_control:
+        loop_var: dep_role
+      when: dep_roles.roles is defined and dep_roles.roles|length>0

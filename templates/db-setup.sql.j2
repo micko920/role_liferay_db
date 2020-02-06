@@ -1,0 +1,36 @@
+--
+-- Setup database and user for liferay
+--
+
+SET statement_timeout = 0;
+SET client_encoding = '{{ liferay_db_encoding }}';
+SET standard_conforming_strings = on;
+SET check_function_bodies = false;
+SET client_min_messages = warning;
+
+--
+-- Create User: {{ liferay_db_user }}
+--
+
+DROP OWNED BY {{ liferay_db_user }};
+DROP DATABASE IF EXISTS {{ liferay_db_name }};
+DROP ROLE IF EXISTS {{ liferay_db_user }};
+
+CREATE ROLE {{ liferay_db_user }} LOGIN
+  ENCRYPTED PASSWORD '{{ liferay_db_password }}';
+
+
+--
+-- Name: {{ liferay_db_name }}; Type: DATABASE; Schema: -; Owner: {{ liferay_db_user }}
+--
+
+CREATE DATABASE {{ liferay_db_name }}
+  WITH OWNER = {{ liferay_db_user }}
+       ENCODING = '{{ liferay_db_encoding }}'
+       TEMPLATE = template0
+       TABLESPACE = pg_default
+       LC_COLLATE = '{{ liferay_db_locale }}'
+       LC_CTYPE = '{{ liferay_db_locale }}'
+       CONNECTION LIMIT = -1;
+
+

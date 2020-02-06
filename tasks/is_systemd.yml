@@ -1,0 +1,17 @@
+---
+- name: check PID 1
+  become: true
+  become_user: root
+  stat:
+    path: "/proc/1/exe"
+    follow: false
+  register: PID_1_EXE
+  when: ansible_system is match("Linux")
+
+- name: Set the PID_1 fact
+  set_fact:
+    systemd_pid_1: true
+  when:
+    - ansible_system is match("Linux")
+    - PID_1_EXE.stat.islnk is defined and PID_1_EXE.stat.islnk
+    - PID_1_EXE.stat.lnk_target|basename is match("systemd")
