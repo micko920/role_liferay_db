@@ -18,6 +18,8 @@ postgresql_final_state: "stop"
 postgresql_global_config_options:
   - option: unix_socket_directories
     value: '{{ postgresql_unix_socket_directories | join(",") }}'
+  - option: data_directory
+    value: '{{ postgresql_data_dir }}'
   - option: listen_addresses
     value: '*'
 
