@@ -1,7 +1,6 @@
 ---
 - name: restart postgresql
-  service:
+  systemd:
     name: "{{ postgresql_daemon }}"
     state: "{{ postgresql_restarted_state }}"
-    sleep: 5
   when: systemd_pid_1 is defined and systemd_pid_1
