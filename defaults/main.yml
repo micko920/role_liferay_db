@@ -12,7 +12,7 @@ postgresql_unix_socket_directories:
 postgresql_service_state: started
 postgresql_service_enabled: true
 # final state to leave the service
-postgresql_final_state: "stop"
+postgresql_final_state: "stopped"
 
 # Global configuration options that will be set in postgresql.conf.
 postgresql_global_config_options:
