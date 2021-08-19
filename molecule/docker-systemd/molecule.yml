@@ -8,11 +8,9 @@ dependency:
 
 driver:
   name: docker
-lint:
-  name: yamllint
 platforms:
-  - name: homelab-systemd-local
-    image: ${MOLECULE_DOCKER_IMAGE:-"homelab-systemd:local"}
+  - name: "homelab-systemd-local-${role_under_test:-norole}"
+    image: "${MOLECULE_DOCKER_SYSTEMD_IMAGE:-homelab-systemd:local}"
     command: "/sbin/init"
     tmpfs:
       - /run
@@ -25,13 +23,9 @@ platforms:
       - SYS_ADMIN
 provisioner:
   name: ansible
-  lint:
-    name: ansible-lint
   inventory:
     group_vars:
       all:
         ansible_python_interpreter: /usr/bin/python3
 verifier:
   name: testinfra
-  lint:
-    name: flake8

@@ -4,6 +4,3 @@
   become: true
   vars_files:
     - ../env.yml
-
-  roles:
-    - role: "{{ role_under_test }}"

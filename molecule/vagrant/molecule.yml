@@ -2,31 +2,36 @@
 dependency:
   name: galaxy
   options:
-    ignore-certs: True
-    ignore-errors: True
+    ignore-certs: true
+    ignore-errors: true
     role-file: molecule/requirements.yml
 
 driver:
   name: vagrant
   provider:
     name: virtualbox
-lint:
-  name: yamllint
 platforms:
-  - name: instance
-    box: debian/buster64
+  - name: "homelab-box"
+    box: "debian/${MOLECULE_VAGRANT_BOX:-bullseye64}"
     # This is to fix the error ACCESS_DENIED when it tryes to write the console
     # log to the installation directory.
     #
-    # Stderr: VBoxManage: error: RawFile#0 failed to create the raw output file /data/virtualenvs/ansible-2.7.1-molecule-2.19.0/lib/python2.7/site-packages/molecule/provisioner/ansible/playbooks/vagrant/ubuntu-xenial-16.04-cloudimg-console.log (VERR_ACCESS_DENIED)
-    # VBoxManage: error: Details: code NS_ERROR_FAILURE (0x80004005), component ConsoleWrap, interface IConsole
+    # Stderr: VBoxManage: error: RawFile#0 failed to create the raw output file
+    # /data/virtualenvs/ansible-2.7.1-molecule-2.19.0/lib/python2.7/ ...
+    # site-packages/molecule/provisioner/ansible/playbooks/vagrant/  ...
+    # ubuntu-xenial-16.04-cloudimg-console.log
+    # (VERR_ACCESS_DENIED) VBoxManage: error: Details: code NS_ERROR_FAILURE
+    # (0x80004005), component ConsoleWrap, interface IConsole
     #
     #
     provider_raw_config_args:
       - "customize [ 'modifyvm', :id, '--uartmode1', 'disconnected' ]"
 provisioner:
   name: ansible
-  lint:
-    name: ansible-lint
+  log: true
+  inventory:
+    group_vars:
+      all:
+        ansible_python_interpreter: /usr/bin/python3
 verifier:
   name: testinfra
