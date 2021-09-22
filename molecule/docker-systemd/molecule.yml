@@ -16,6 +16,13 @@ platforms:
       - /run
       - /run/lock
       - /tmp
+    exposed_ports:
+      - 80
+      - 443
+      - 3838
+      - 8080
+      - 8787
+      - 9090
     volumes:
       - /sys/fs/cgroup:/sys/fs/cgroup:ro
     pre_build_image: true
